@@ -1,7 +1,6 @@
 from rest_framework import viewsets
 from ds_management.models import Item,ItemCategory,ItemElement,StackQueue
-from ds_management.utilities.data_layer_utils import add_new_element
-from ds_management.serializers import ItemCategorySerializer,ItemSerializer,ItemElementSerializer,StackQueueSerializer
+from ds_management.serializers import ItemCategorySerializer,ItemSerializer,StackQueueSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
@@ -51,22 +50,20 @@ def item_element(request, pk):
     except item.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     item_id =item.id
-    structure_type = item.category_name.category_name
     if request.method == 'POST':
 
         element_data = request.data[element_data_str]
         response_result = ItemElement.objects.add_new_element(item_id,
                                                               element_data,
-                                                              structure_type)
+                                                              )
         response_data={"element_id":response_result.id,"item_id":pk}
         result_status =status.HTTP_201_CREATED
 
     if request.method == 'GET':
-        if structure_type and structure_type is DataStructures.queue or DataStructures.stack:
-            response_result = StackQueue.objects.pop(item_id)
+            response_result = ItemElement.objects.pop(item_id)
             if response_result:
                 response_data = {
-                             "item_id":pk,
+                             "item_id": pk,
                              "element_data":response_result.element_data,
                              "element_id": response_result.id
                              }

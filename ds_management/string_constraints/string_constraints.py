@@ -8,6 +8,7 @@ class DataStructures:
 structure_str = "structure"
 element_data_str = 'element_data'
 item_str= 'item'
+item_name_str='item_name'
 item_category_str ='item_category'
 position_str ='position'
 item_id_str ='item_id'
