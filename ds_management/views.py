@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from ds_management.models import Item,ItemCategory,ItemElement,StackQueue
-from ds_management.utilities.data_layer_utils import add_element_to_stack_queue
+from ds_management.utilities.data_layer_utils import add_new_element
 from ds_management.serializers import ItemCategorySerializer,ItemSerializer,ItemElementSerializer,StackQueueSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -16,22 +16,32 @@ def add_item(request):
     List all articles or create a new article.
     """
 
-    item_serializer = ItemSerializer(data=request.data)
+
     try:
         item_category = ItemCategory.objects.get(category_name = request.data['category_name'] )
     except:
-        Response(item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    if item_serializer.is_valid():
+        response_str ="No such category_exists"
+        return_status = status.HTTP_400_BAD_REQUEST
+        return Response(response_str, return_status)
+
+
+    try:
         element = Item.objects.create(item_name =request.data['item_name'],
-                                      category_name=item_category,
-                                             )
-        return Response({"element_id":element.id}, status=status.HTTP_201_CREATED)
-    return Response(item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                                          category_name=item_category,
+                                                 )
+        return_status = status.HTTP_201_CREATED
+        response_str = {"element_id":element.id}
+    except Exception as e:
+        response_str = str(e)
+        return_status = status.HTTP_400_BAD_REQUEST
+
+    return Response(response_str, return_status)
+
 
 
 @csrf_exempt
-@api_view(['POST'])
-def add_item_element(request, pk):
+@api_view(['POST','GET'])
+def item_element(request, pk):
     """
     List all articles, or create a new article.
     """
@@ -40,17 +50,55 @@ def add_item_element(request, pk):
         item = Item.objects.get(pk=pk)
     except item.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    element_to_insert = request.data
-    element=ItemElement.objects.create(item_id=item.id,
-                               element_data=element_to_insert[element_data_str],
-                               )
-    structure_type = item.item_type.category_name
+    item_id =item.id
+    structure_type = item.category_name.category_name
+    if request.method == 'POST':
+
+        element_data = request.data[element_data_str]
+        response_result = ItemElement.objects.add_new_element(item_id,
+                                                              element_data,
+                                                              structure_type)
+        response_data={"element_id":response_result.id,"item_id":pk}
+        result_status =status.HTTP_201_CREATED
+
+    if request.method == 'GET':
+        if structure_type and structure_type is DataStructures.queue or DataStructures.stack:
+            response_result = StackQueue.objects.pop(item_id)
+            if response_result:
+                response_data = {
+                             "item_id":pk,
+                             "element_data":response_result.element_data,
+                             "element_id": response_result.id
+                             }
+                result_status = status.HTTP_200_OK
+            else:
+                response_data="This item does not have elements"
+                result_status= status.HTTP_400_BAD_REQUEST
+
+
+    return Response(response_data, status=result_status)
+
+
+
+
+@csrf_exempt
+@api_view(['GET'])
+def get_item_element( pk):
+    """
+    List all articles, or create a new article.
+    """
+
+    try:
+        item = Item.objects.get(pk=pk)
+    except item.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    structure_type = item.category_name.category_name
     if structure_type and structure_type is DataStructures.queue or DataStructures.stack:
-        new_element = add_element_to_stack_queue(item_id=item.id,
-                                                 element_id=element.id)
+        new_element = StackQueue.objects.pop(item_id=item.id)
         new_element_serializer = StackQueueSerializer(new_element)
 
-    return Response(request.data, status=status.HTTP_201_CREATED)
+    return Response(new_element_serializer.data, status=status.HTTP_201_CREATED)
 
 
 

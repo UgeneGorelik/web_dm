@@ -5,7 +5,7 @@ Publisher: Packt Publishing Ltd. - http://www.packtpub.com
 """
 
 from django.urls import path,re_path
-from ds_management.views import add_item,add_item_element
+from ds_management.views import add_item,item_element
 from ds_management.views import ItemCategoryViewSet,StackQueueViewSet
 from ds_management.views import ItemViewSet
 from rest_framework.routers import DefaultRouter
@@ -20,6 +20,6 @@ router.register(r'api/list_stack_queue', StackQueueViewSet)
 
 urlpatterns = [
     path('items', add_item),
-    re_path(r'^items/(?P<pk>[0-9]+)$', add_item_element),
+    re_path(r'^items/(?P<pk>[0-9]+)$', item_element),
     url(r'', include(router.urls)),
 ]
