@@ -2,6 +2,7 @@ class DataStructures:
     stack = "stack"
     array = "array"
     queue = "queue"
+    list = "list"
 
 
 structure_str = "structure"
