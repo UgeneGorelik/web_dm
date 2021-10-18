@@ -32,7 +32,15 @@ class Item(models.Model):
 
 
 class ItemElementManager(BaseUserManager):
-    def add_new_element(self,item_id, element_data, structure_type):
+
+    def pop(self,item_id):
+        structure_type = Item.objects.get(pk=item_id).category_name.category_name
+        if structure_type and structure_type is DataStructures.queue or DataStructures.stack:
+           response_result = StackQueue.objects.pop(item_id)
+        return response_result
+
+    def add_new_element(self,item_id, element_data):
+        structure_type = Item.objects.get(pk=item_id).category_name.category_name
         element = ItemElement.objects.create(item_id=item_id,
                                              element_data=element_data,
                                              )
