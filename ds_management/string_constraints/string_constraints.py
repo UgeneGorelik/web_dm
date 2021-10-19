@@ -1,26 +1,27 @@
+from typing import Tuple
+
 class DataStructures:
-    stack = "stack"
-    array = "array"
-    queue = "queue"
-    list = "list"
+    stack: str = "stack"
+    array: str = "array"
+    queue: str = "queue"
+    list: str = "list"
 
 
-structure_str = "structure"
-element_data_str = 'element_data'
-item_str= 'item'
-item_name_str='item_name'
-item_category_str ='item_category'
-position_str ='position'
-item_id_str ='item_id'
-position__max_str='position__max'
-category_str='category'
-name_str='name'
-LIST = 'L'
-STACK = 'S'
-QUEUE = 'Q'
-STRUCTURE_CHOICES = (
+structure_str: str = "structure"
+element_data_str: str = 'element_data'
+item_str: str = 'item'
+item_name_str: str = 'item_name'
+item_category_str: str = 'item_category'
+position_str: str = 'position'
+item_id_str: str = 'item_id'
+position__max_str: str = 'position__max'
+category_str: str = 'category'
+name_str: str = 'name'
+LIST: str = 'L'
+STACK: str = 'S'
+QUEUE: str = 'Q'
+STRUCTURE_CHOICES: Tuple = (
     (LIST, 'list'),
     (STACK, 'stack'),
     (QUEUE, 'queue'),
 )
-
