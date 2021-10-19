@@ -15,10 +15,12 @@ class ItemCategorySerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     item_elements = serializers.StringRelatedField(many=True)
     category_name = serializers.CharField(source="category_name.category_name", read_only=True)
+    owner_name = serializers.CharField(source="owner.username", read_only=True)
     class Meta:
         model = Item
         fields = (
             'id',
+            'owner_name',
             'item_name',
             'category_name',
             'item_elements'
