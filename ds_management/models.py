@@ -95,7 +95,6 @@ class StackQueueManager(models.Manager):
     def pop(self,item_id):
         item = Item.objects.get(pk=item_id)
         structure_type = item.category_name.category_name
-        element_to_pop = None
         element_to_pop_index = None
 
         if not self.is_empty(item_id):
