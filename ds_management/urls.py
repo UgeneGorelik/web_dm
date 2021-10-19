@@ -10,6 +10,7 @@ from ds_management.views import ItemCategoryViewSet,StackQueueViewSet
 from ds_management.views import ItemViewSet
 from rest_framework.routers import DefaultRouter
 from django.conf.urls import url, include
+from django.contrib import admin
 
 
 router = DefaultRouter()
@@ -22,4 +23,5 @@ urlpatterns = [
     path('items', add_item),
     re_path(r'^items/(?P<pk>[0-9]+)$', item_element),
     url(r'', include(router.urls)),
+    path('admin/', admin.site.urls)
 ]
