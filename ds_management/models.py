@@ -26,6 +26,16 @@ class Item(models.Model):
                                          on_delete=models.CASCADE,
                                          default=1
                                         )
+    owner = models.ForeignKey(
+        'auth.User',
+        related_name='items',
+        on_delete=models.CASCADE,
+        default = 0
+
+    )
+
+    class Meta:
+        unique_together = ('owner', 'item_name')
 
     def __str__(self):
         return self.item_name

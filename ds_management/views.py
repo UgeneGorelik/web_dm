@@ -1,8 +1,10 @@
 from rest_framework import viewsets
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from ds_management.models import Item,ItemCategory,ItemElement,StackQueue
 from ds_management.serializers import ItemCategorySerializer,ItemSerializer,StackQueueSerializer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from ds_management.string_constraints.string_constraints import *
@@ -10,6 +12,7 @@ from ds_management.string_constraints.string_constraints import *
 
 @csrf_exempt
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_item(request):
     """
     List all articles or create a new article.
@@ -23,10 +26,11 @@ def add_item(request):
         return_status = status.HTTP_400_BAD_REQUEST
         return Response(response_str, return_status)
 
-
+    user = request.user
     try:
         element = Item.objects.create(item_name =request.data['item_name'],
                                           category_name=item_category,
+                                          owner=user
                                                  )
         return_status = status.HTTP_201_CREATED
         response_str = {"element_id":element.id}
@@ -55,6 +59,7 @@ def item_element(request, pk):
         element_data = request.data[element_data_str]
         response_result = ItemElement.objects.add_new_element(item_id,
                                                               element_data,
+
                                                               )
         response_data={"element_id":response_result.id,"item_id":pk}
         result_status =status.HTTP_201_CREATED
