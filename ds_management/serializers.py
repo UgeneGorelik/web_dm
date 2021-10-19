@@ -8,7 +8,7 @@ class ItemCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemCategory
         fields = (
-            'category_name',
+             'category_name',
             )
 
 
