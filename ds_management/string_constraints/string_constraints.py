@@ -1,10 +1,12 @@
-from typing import Tuple
+from typing import Tuple,Dict
+from dataclasses import dataclass
 
 class DataStructures:
     stack: str = "stack"
     array: str = "array"
     queue: str = "queue"
     list: str = "list"
+
 
 
 structure_str: str = "structure"
@@ -15,8 +17,16 @@ item_category_str: str = 'item_category'
 position_str: str = 'position'
 item_id_str: str = 'item_id'
 position__max_str: str = 'position__max'
+position__min_str: str = 'position__min'
 category_str: str = 'category'
 name_str: str = 'name'
+operation_str: str = 'operation'
+peek_str: str = 'peek'
+OPERATIONS: Dict = {
+    'peek' :"peek",
+    'pop':  "pop",
+    'push': "queue"}
+
 LIST: str = 'L'
 STACK: str = 'S'
 QUEUE: str = 'Q'
