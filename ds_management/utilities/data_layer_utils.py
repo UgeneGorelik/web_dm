@@ -1,20 +1,15 @@
 from ds_management.models import Item,ItemCategory,ItemElement,StackQueue
 from ds_management.string_constraints.string_constraints import *
-from ds_management.serializers import StackQueueSerializer
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Max
+from ds_management.models import ItemElement,Item,StackQueue;
 
+def get_item_by_pk(item_id):
+    item: Item = Item.objects.get(pk=item_id)
+    return item
 
-def add_new_element( item_id, element_data,structure_type):
+def get_item_element_by_id(element_id):
+    element: ItemElement = ItemElement.objects.get(id=element_id)
+    return element
 
-    element = ItemElement.objects.create(item_id=item_id,
-                                         element_data=element_data,
-                                         )
-
-
-    if structure_type and structure_type is DataStructures.queue or DataStructures.stack:
-        new_element = StackQueue.objects.push(item_id=item_id,
-                                              element_id=element.id)
-        new_element_serializer = StackQueueSerializer(new_element)
-        response_data = {"id": new_element_serializer.id}
-        return new_element
+def check_if_stack_queue_empty(item_id):
+    have_items = StackQueue.filter(item_id=item_id).exists()
+    return not have_items

@@ -1,11 +1,13 @@
 from rest_framework import viewsets
-from typing import Dict
 from rest_framework.permissions import IsAuthenticated
 from ds_management.models import Item, ItemCategory, ItemElement, StackQueue
 from ds_management.serializers import ItemCategorySerializer, ItemSerializer, StackQueueSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
+from ds_management.ds_models.item_element_ds import ItemElemenDS
+from ds_management.ds_models.stack_queue_ds import StackQueueDs
+
 from ds_management.string_constraints.string_constraints import *
 
 
@@ -62,7 +64,7 @@ def item_element_view(request, pk):
     try:
         if request.method == 'POST':
             element_data: Dict = request.data[element_data_str]
-            response_result: ItemElement = ItemElement.objects.add_new_element(item_id,
+            response_result: ItemElement = ItemElemenDS.push(item_id,
                                                                                element_data,
                                                                                )
             response_data: Dict = {"element_id": response_result.id, "item_id": pk}
@@ -70,9 +72,9 @@ def item_element_view(request, pk):
 
         if request.method == 'GET':
             if ds_operation == OPERATIONS[peek_str]:
-                response_result: ItemElement = ItemElement.objects.peek(item_id)
+                response_result: ItemElement = ItemElemenDS.peek(item_id)
             else:
-                response_result: ItemElement = ItemElement.objects.pop(item_id)
+                response_result: ItemElement = ItemElemenDS.pop(item_id)
 
             if response_result:
                 response_data = {

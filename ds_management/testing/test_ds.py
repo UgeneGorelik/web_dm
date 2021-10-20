@@ -1,6 +1,8 @@
 from django.test import TestCase
 from ds_management.models import Item, ItemElement, ItemCategory
 from django.contrib.auth.models import User
+from ds_management.ds_models.stack_queue_ds import StackQueueDs
+from ds_management.ds_models.item_element_ds import ItemElemenDS
 from ds_management.string_constraints.string_constraints import *
 
 dummy_object_name: str = "test"
@@ -37,15 +39,15 @@ class DsTestCase(TestCase):
                                          category_name=item_category_list,
                                          owner=OWNER)
 
-        ItemElement.objects.add_new_element(item.id,
+        ItemElemenDS.push(item.id,
                                             element_data={"st": 1},
                                             )
 
-        ItemElement.objects.add_new_element(item.id,
+        ItemElemenDS.push(item.id,
                                             element_data={"st": 2},
                                             )
 
-        pop_responce: Item = ItemElement.objects.pop(item.id)
+        pop_responce: Item = ItemElemenDS.pop(item.id)
 
         assert pop_responce.element_data['st'] == 2
 
@@ -56,15 +58,15 @@ class DsTestCase(TestCase):
                                          category_name=item_category_list,
                                          owner=OWNER)
 
-        ItemElement.objects.add_new_element(item.id,
+        ItemElemenDS.push(item.id,
                                             element_data={"st": 1},
                                             )
 
-        ItemElement.objects.add_new_element(item.id,
+        ItemElemenDS.push(item.id,
                                             element_data={"st": 2},
                                             )
 
-        pop_responce: ItemElement = ItemElement.objects.pop(item.id)
+        pop_responce: ItemElement = ItemElemenDS.pop(item.id)
 
         assert pop_responce.element_data['st'] == 1
 
@@ -75,14 +77,14 @@ class DsTestCase(TestCase):
                                          category_name=item_category_queue,
                                          owner=OWNER)
 
-        ItemElement.objects.add_new_element(item.id,
+        ItemElemenDS.push(item.id,
                                             element_data={"st": 1},
                                             )
 
-        ItemElement.objects.add_new_element(item.id,
+        ItemElemenDS.push(item.id,
                                             element_data={"st": 2},
                                             )
 
-        pop_responce: Item = ItemElement.objects.pop(item.id)
+        pop_responce: Item = ItemElemenDS.pop(item.id)
 
         assert pop_responce.element_data['st'] == 1
