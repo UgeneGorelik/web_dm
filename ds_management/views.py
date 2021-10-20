@@ -5,15 +5,13 @@ from ds_management.models import Item, ItemCategory, ItemElement, StackQueue
 from ds_management.serializers import ItemCategorySerializer, ItemSerializer, StackQueueSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from ds_management.string_constraints.string_constraints import *
 
 
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_item(request):
+def item_view(request):
     """
     add new item
     :param request:
@@ -30,9 +28,9 @@ def add_item(request):
     user: str = request.user
     try:
         element: Item = Item.objects.create(item_name=request.data['item_name'],
-                                      category_name=item_category,
-                                      owner=user
-                                      )
+                                            category_name=item_category,
+                                            owner=user
+                                            )
         return_status: str = status.HTTP_201_CREATED
         response_str: str = {"element_id": element.id}
     except KeyError as e:
@@ -42,40 +40,53 @@ def add_item(request):
     return Response(response_str, return_status)
 
 
-@csrf_exempt
 @api_view(['POST', 'GET'])
-def item_element(request, pk):
+def item_element_view(request, pk):
     """
     add or remove new element
     on GET for stack queue and list the LAST ELEMENT gets removed
     """
 
     try:
-        item: ItemElement = Item.objects.get(pk=pk)
+        item: Item = Item.objects.get(pk=pk)
     except item.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    ds_operation: str = request.query_params.get(operation_str)
+
+    if ds_operation and ds_operation not in OPERATIONS:
+        return Response(f"{operation} is not supported",
+                        status=status.HTTP_404_NOT_FOUND)
+
     item_id: int = item.id
-    if request.method == 'POST':
-        element_data: Dict = request.data[element_data_str]
-        response_result: ItemElement = ItemElement.objects.add_new_element(item_id,
-                                                              element_data,
+    try:
+        if request.method == 'POST':
+            element_data: Dict = request.data[element_data_str]
+            response_result: ItemElement = ItemElement.objects.add_new_element(item_id,
+                                                                               element_data,
+                                                                               )
+            response_data: Dict = {"element_id": response_result.id, "item_id": pk}
+            result_status: str = status.HTTP_201_CREATED
 
-                                                              )
-        response_data: Dict = {"element_id": response_result.id, "item_id": pk}
-        result_status: str = status.HTTP_201_CREATED
+        if request.method == 'GET':
+            if ds_operation == OPERATIONS[peek_str]:
+                response_result: ItemElement = ItemElement.objects.peek(item_id)
+            else:
+                response_result: ItemElement = ItemElement.objects.pop(item_id)
 
-    if request.method == 'GET':
-        response_result: ItemElement = ItemElement.objects.pop(item_id)
-        if response_result:
-            response_data = {
-                "item_id": pk,
-                "element_data": response_result.element_data,
-                "element_id": response_result.id
-            }
-            result_status: str = status.HTTP_200_OK
-        else:
-            response_data: str = "This item does not have elements"
-            result_status: str = status.HTTP_400_BAD_REQUEST
+            if response_result:
+                response_data = {
+                    "item_id": pk,
+                    "element_data": response_result.element_data,
+                    "element_id": response_result.id
+                }
+                result_status: str = status.HTTP_200_OK
+            else:
+                response_data: str = "This item does not have elements"
+                result_status: str = status.HTTP_400_BAD_REQUEST
+    except KeyError as e:
+        response_data: str = str(e)
+        result_status: status = status.HTTP_400_BAD_REQUEST
 
     return Response(response_data, status=result_status)
 
