@@ -1,9 +1,7 @@
 from django.db import models
 from django.contrib.postgres.indexes import HashIndex
-from django.contrib.auth.models import BaseUserManager
 from ds_management.string_constraints.string_constraints import *
-from typing import Dict
-
+from ds_management.ds_models.stack_queue_ds import StackQueueManager
 import json
 
 
@@ -53,20 +51,40 @@ class ItemElement(models.Model):
         return json.dumps(self.element_data)
 
 
-class StackQueue(models.Model):
+class StackQueue(ItemElement):
     position = models.IntegerField()
+    objects = StackQueueManager()
+    item_field = models.ForeignKey(
+        Item,
+        related_name='item_no',
+        on_delete=models.CASCADE,
+        default = ''
+        )
+
+
+
+    class Meta:
+        unique_together = ('item_field', 'position',)
+
+        indexes = [HashIndex(fields=['item_field']),
+
+                   ]
+
+
+class BTree(models.Model):
+    right = models.IntegerField(blank=True)
+    left = models.IntegerField(blank=True)
     item = models.ForeignKey(
         Item,
         related_name='+',
         on_delete=models.CASCADE)
-    element = models.ForeignKey(
+    val = models.ForeignKey(
         ItemElement,
         related_name='+',
         on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('item_id', 'position',)
-
+        unique_together = ('item_id', 'val',)
         indexes = [HashIndex(fields=['item']),
-                   models.Index(fields=['element'])
+
                    ]
