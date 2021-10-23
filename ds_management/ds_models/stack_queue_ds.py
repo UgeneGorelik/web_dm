@@ -56,7 +56,7 @@ class StackQueueManager(models.Manager):
     # todo to implement as linked list:https://isaaccomputerscience.org/concepts/dsa_datastruct_stack?examBoard=all&stage=all
     def is_empty(self, item_id) -> bool:
         """
-        check if data structure  have any element left
+        check if data structure   have any element left
         :param item_id:
         :return: item element
         """

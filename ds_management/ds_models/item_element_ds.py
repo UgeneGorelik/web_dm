@@ -15,7 +15,7 @@ from ds_management.string_constraints.string_constraints import *
 #         :return:
 #         """
 #
-#         response_ result: Dict = StackQueueDs.pop(item_id)
+#         response_result: Dict = StackQueueDs.pop(item_id)
 #         return response_result
 #
 #     @staticmethod
