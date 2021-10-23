@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.indexes import HashIndex
 from ds_management.string_constraints.string_constraints import *
 from ds_management.ds_models.stack_queue_ds import StackQueueManager
+from ds_management.ds_models.avltree_ds import AVLtreeManager
 import json
 
 
@@ -71,20 +72,22 @@ class StackQueue(ItemElement):
                    ]
 
 
-class BTree(models.Model):
-    right = models.IntegerField(blank=True)
-    left = models.IntegerField(blank=True)
-    item = models.ForeignKey(
+class AVLTree(ItemElement):
+    objects = AVLtreeManager()
+    val = models.IntegerField(blank=True,default=-1)
+    root = models.BooleanField(blank=True, default=False)
+    right = models.IntegerField(blank=True,default=-1)
+    left = models.IntegerField(blank=True,default=-1)
+    height = models.IntegerField(blank=True,default=-20)
+    item_field = models.ForeignKey(
         Item,
-        related_name='+',
-        on_delete=models.CASCADE)
-    val = models.ForeignKey(
-        ItemElement,
-        related_name='+',
-        on_delete=models.CASCADE)
+        related_name='item_field',
+        on_delete=models.CASCADE,
+        default=''
+    )
 
     class Meta:
-        unique_together = ('item_id', 'val',)
-        indexes = [HashIndex(fields=['item']),
+        indexes = [HashIndex(fields=['item_field']),
 
                    ]
+
