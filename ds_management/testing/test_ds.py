@@ -144,9 +144,9 @@ class DsTestCase(TestCase):
         root = AVLTree.objects.get_root(item_id=item.id)
 
 
+        result = AVLTree.objects.preOrderAsJson(root=root)
         result = AVLTree.objects.preOrder(root=root)
-        print(result)
 
         assert result == [30, 20, 10, 25, 40, 50]
 
-        # assert pop_responce.element_data['st'] == 1
+

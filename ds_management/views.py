@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from ds_management.models import Item, ItemCategory, ItemElement, StackQueue
+from ds_management.models import Item, ItemCategory, ItemElement, StackQueue ,AVLTree
 from ds_management.serializers import ItemCategorySerializer, ItemSerializer, StackQueueSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -64,27 +64,42 @@ def item_element_view(request, pk):
     ds_type = item.category_name.category_name
     try:
         if request.method == 'POST':
-            element_data: Dict = request.data[element_data_str]
-            response_result: ItemElement = StackQueue.objects.push(item_id ,element_data
-                                                                               )
-            response_data: Dict = {"element_id": response_result.id, "item_id": pk}
-            result_status: str = status.HTTP_201_CREATED
-
+            if ds_type in [DataStructures.queue,DataStructures.stack]:
+                element_data: Dict = request.data[element_data_str]
+                response_result: ItemElement = StackQueue.objects.push(item_id ,element_data
+                                                                                   )
+                response_data: Dict = {"element_id": response_result.id, "item_id": pk}
+                result_status: str = status.HTTP_201_CREATED
+            elif ds_type == DataStructures.avltree:
+                AVLTree.objects.insert(
+                    request.data['key'],
+                    pk,
+                    element_data=request.data[element_data_str],
+                )
+                response_data: Dict = {"element_id": None, "item_id": pk}
+                result_status =status.HTTP_201_CREATED
         if request.method == 'GET':
             if ds_operation == OPERATIONS[peek_str]:
                 response_result: ItemElement = StackQueue.objects.pop(item_id,
                                                                       category=ds_type,
                                                                       remove_item=False)
-            else:
+
+            elif ds_type in [DataStructures.stack,DataStructures.queue]:
                 response_result: ItemElement = StackQueue.objects.pop(item_id,
                                                                       category=ds_type)
 
+            elif ds_type == DataStructures.avltree:
+                root = AVLTree.objects.get_root(item_id=item_id)
+                response_result = AVLTree.objects.preOrderAsJson(root=root)
+
+            response_data = {
+                "item_id": pk,
+                "element_data": response_result,
+                "element_id": None
+            }
+
             if response_result:
-                response_data = {
-                    "item_id": pk,
-                    "element_data": response_result.element_data,
-                    "element_id": response_result.itemelement_ptr_id
-                }
+
                 result_status: str = status.HTTP_200_OK
             else:
                 response_data: str = "This item does not have elements"
