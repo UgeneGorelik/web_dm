@@ -74,11 +74,11 @@ class StackQueue(ItemElement):
 
 class AVLTree(ItemElement):
     objects = AVLtreeManager()
-    val = models.IntegerField(blank=True,default=-1)
+    val = models.IntegerField(blank=True,null=True)
     root = models.BooleanField(blank=True, default=False)
-    right = models.IntegerField(blank=True,default=-1)
-    left = models.IntegerField(blank=True,default=-1)
-    height = models.IntegerField(blank=True,default=-20)
+    right = models.IntegerField(blank=True,null=True)
+    left = models.IntegerField(blank=True,null=True)
+    height = models.IntegerField(blank=True,default=1)
     item_field = models.ForeignKey(
         Item,
         related_name='item_field',
