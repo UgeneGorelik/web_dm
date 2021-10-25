@@ -6,6 +6,7 @@ class DataStructures:
     array: str = "array"
     queue: str = "queue"
     list: str = "list"
+    avltree: str = "avltree"
 
 
 
