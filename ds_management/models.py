@@ -87,6 +87,7 @@ class AVLTree(ItemElement):
     )
 
     class Meta:
+        # unique_together = ('item_field', 'val',)
         indexes = [HashIndex(fields=['item_field']),
 
                    ]
